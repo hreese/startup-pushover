@@ -9,10 +9,18 @@ pull requests .
 
 Install [Go](https://golang.org).
 
-Get the source and all dependecies: `go get gitlab.com/hreese/startup-pushover`
+Get the source and all dependecies:
+```
+go get gitlab.com/hreese/startup-pushover
+```
 
-Build for local plattform: `go build -ldflags="-s -w" gitlab.com/hreese/startup-pushover`
+Build for local plattform:
+```
+go build -ldflags="-s -w" gitlab.com/hreese/startup-pushover
+```
 
-To cross compile, find the proper set of variables and prepend them to the `build` command. For example,
-to build for Raspberry Pi 1, use
-`GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" gitlab.com/hreese/startup-pushover`
+To cross compile, find [the proper set of variables](https://golang.org/doc/install/source#environment)
+and prepend them to the `build` command. For example, to build for Raspberry Pi 1, use
+```
+GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" gitlab.com/hreese/startup-pushover
+```
