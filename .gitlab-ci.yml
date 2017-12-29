@@ -25,10 +25,10 @@ build-project:
   script:
     - OUTPUT="output"
     - mkdir -p $GOPATH/src/$REPO_NAME
-    - mv $CI_PROJECT_DIR/* $CI_PROJECT_DIR/.* $GOPATH/src/$REPO_NAME/
+    - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME/
     - cd $GOPATH/src/$REPO_NAME
     - go get -v .
-    - bash .build-all.sh $OUTPUT $CI_PROJECT_DIR
+    - bash build-all.sh $OUTPUT $CI_PROJECT_DIR
     
   artifacts:
     paths:
