@@ -1,0 +1,34 @@
+image: golang:latest
+
+variables:
+  REPO_NAME: gitlab.com/hreese/startup-pushover
+
+before_script:
+  - go version
+  - echo $CI_BUILD_REF
+  - echo $CI_PROJECT_DIR
+
+stages:
+  - test
+  - build
+  
+test-project:
+  stage: test
+  script:
+    - mkdir -p $GOPATH/src/$REPO_NAME
+    - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME
+    - cd $GOPATH/src/$REPO_NAME
+    - go test $(go list ./... | grep -v /vendor/)
+    
+build-project:
+  stage: build
+  script:
+    - OUTPUT="output"
+    - mkdir -p $GOPATH/src/$REPO_NAME
+    - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME/
+    - cd $GOPATH/src/$REPO_NAME
+    - bash .build-all.sh $OUTPUT $CI_PROJECT_DIR
+    
+  artifacts:
+    paths:
+      - artifacts/

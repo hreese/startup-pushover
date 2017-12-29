@@ -25,9 +25,11 @@ type pushovercredentials struct {
 }
 
 func init() {
+	// read commandline options
 	flag.StringVar(&configfilename, "config", "startup-pushover.json", "Filename of config file")
 	flag.Parse()
 
+	// parse config file
 	file,err := os.Open(configfilename)
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err)
@@ -86,8 +88,13 @@ func main() {
 		Sound:     pushover.SoundMagic,
 	}
 
+	// create pushover sender
 	app := pushover.New(pocreds.Token)
+
+	// set pushover recipient
 	recipient := pushover.NewRecipient(pocreds.Recipient)
+
+	// send pushover message
 	resp, err := app.SendMessage(message, recipient)
 	if err != nil {
 		log.Println(err)
