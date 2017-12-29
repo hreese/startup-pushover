@@ -11,7 +11,7 @@ before_script:
 stages:
   - build
   
-test-project:
+.test-project:
   stage: test
   script:
     - mkdir -p $GOPATH/src/$REPO_NAME
