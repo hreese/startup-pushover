@@ -1,0 +1,12 @@
+[Unit]
+Description=Send host-up notification via pushover.net
+Documentation=https://gitlab.com/hreese/startup-pushover
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/startup-pushover -config /etc/startup-pushover.json
+
+[Install]
+WantedBy=multi-user.target

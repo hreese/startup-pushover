@@ -2,25 +2,26 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"net"
 	"os"
 	"strings"
-	"flag"
 	"time"
+
+	"encoding/json"
 
 	"github.com/gregdel/pushover"
 	log "github.com/sirupsen/logrus"
-	"encoding/json"
 )
 
 var (
 	configfilename string
-	pocreds pushovercredentials
+	pocreds        pushovercredentials
 )
 
 type pushovercredentials struct {
-	Token string
+	Token     string
 	Recipient string
 }
 
@@ -30,7 +31,7 @@ func init() {
 	flag.Parse()
 
 	// parse config file
-	file,err := os.Open(configfilename)
+	file, err := os.Open(configfilename)
 	if err != nil {
 		log.Fatalf("Unable to open config file: %s", err)
 	}
@@ -69,11 +70,11 @@ func main() {
 	for _, i := range interfaces {
 		addrs, _ := i.Addrs()
 		if i.Flags&net.FlagLoopback == 0 && i.Flags&net.FlagUp != 0 && !strings.HasPrefix(i.Name, "docker") && !strings.HasPrefix(i.Name, "virbr") && len(addrs) > 0 {
-			iplist := make([]string, 0, len(addrs))
+			fmt.Fprintf(&messagebody, "Interface <b>%s</b>: ", i.Name)
 			for _, a := range addrs {
-				iplist = append(iplist, a.String())
+				stripped := strings.Split(a.String(), "/")[0]
+				fmt.Fprintf(&messagebody, "<a href=\"ssh://%s\">%s</a>\n", stripped, stripped)
 			}
-			fmt.Fprintf(&messagebody, "Interface %s: %s\n", i.Name, strings.Join(iplist, ", "))
 		}
 	}
 
@@ -81,11 +82,12 @@ func main() {
 	message := &pushover.Message{
 		Message:   messagebody.String(),
 		Title:     subject.String(),
-		Priority:  pushover.PriorityLow,
+		Priority:  pushover.PriorityNormal,
 		Timestamp: time.Now().Unix(),
 		Retry:     60 * time.Second,
 		Expire:    time.Hour,
 		Sound:     pushover.SoundMagic,
+		HTML:      true,
 	}
 
 	// create pushover sender
