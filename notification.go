@@ -15,6 +15,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	MAXTRIES = 10
+)
+
 var (
 	configfilename string
 	pocreds        pushovercredentials
@@ -50,6 +54,7 @@ func main() {
 		subject, messagebody bytes.Buffer
 		interfaces           []net.Interface
 		hostname             string
+		response *pushover.Response
 		err                  error
 	)
 
@@ -96,14 +101,20 @@ func main() {
 	// set pushover recipient
 	recipient := pushover.NewRecipient(pocreds.Recipient)
 
-	// send pushover message
-	resp, err := app.SendMessage(message, recipient)
-	if err != nil {
-		log.Println(err)
+	// try sending pushover message up to MAXTRIES times
+	tries := 0
+	for response, err = app.SendMessage(message, recipient);err != nil && tries < MAXTRIES && response.Status != 1; {
+		tries++
+		log.Println("Error sending notification, sleeping…")
+		time.Sleep(time.Second)
 	}
-	if resp.Status != 1 {
-		log.Println("Error sending notification: ", resp)
-	} else {
+
+	switch {
+	case err != nil:
+		log.Fatal("Error sending notification:s", err)
+	case response.Status != 1:
+		log.Fatal("Received unsuccsessful response:", response)
+	default:
 		log.Println("Successfully sent notification")
 	}
 }
