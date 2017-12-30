@@ -54,7 +54,7 @@ func main() {
 		subject, messagebody bytes.Buffer
 		interfaces           []net.Interface
 		hostname             string
-		response *pushover.Response
+		response             *pushover.Response
 		err                  error
 	)
 
@@ -102,19 +102,23 @@ func main() {
 	recipient := pushover.NewRecipient(pocreds.Recipient)
 
 	// try sending pushover message up to MAXTRIES times
-	tries := 0
-	for response, err = app.SendMessage(message, recipient);err != nil && tries < MAXTRIES && response.Status != 1; {
+	var tries = 0
+SENDLOOP:
+	for {
 		tries++
-		log.Println("Error sending notification, sleeping…")
-		time.Sleep(time.Second)
-	}
-
-	switch {
-	case err != nil:
-		log.Fatal("Error sending notification:s", err)
-	case response.Status != 1:
-		log.Fatal("Received unsuccsessful response:", response)
-	default:
-		log.Println("Successfully sent notification")
+		response, err = app.SendMessage(message, recipient)
+		switch {
+		case tries > MAXTRIES:
+			log.Fatal("Giving up.")
+		case err != nil:
+			log.Error("Error sending notification: ", err)
+		case response != nil && response.Status != 1:
+			log.Error("Pushover response indicates failure: ", response.Errors)
+		default:
+			log.Println("Successfully sent notification")
+			break SENDLOOP
+		}
+		log.Printf("Sleeping %d seconds", tries)
+		time.Sleep(time.Second * time.Duration(tries))
 	}
 }
