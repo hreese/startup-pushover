@@ -30,6 +30,18 @@ GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" gitlab.com/hreese/startu
 
 Run everything as root (or prepend `sudo` to all commands).
 
+Enable support for `network-online.target`. Run one of these:
+```
+# Network Manager
+systemctl enable NetworkManager-wait-online.service
+# systemd-networkd
+systemctl enable systemd-networkd-wait-online.service
+```
+
+See [the official documentation](https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/#cutthecraphowdoimakenetwork.targetworkforme)
+and this [Stackoverflow posting](https://unix.stackexchange.com/questions/126009/cause-a-script-to-execute-after-networking-has-started)
+for details.
+
 Install the executable:
 ```
 cp startup-pushover /usr/local/bin/
