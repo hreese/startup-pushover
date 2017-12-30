@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 
 	"github.com/gregdel/pushover"
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 const (
@@ -111,9 +111,9 @@ SENDLOOP:
 		case tries > MAXTRIES:
 			log.Fatal("Giving up.")
 		case err != nil:
-			log.Error("Error sending notification: ", err)
+			log.Print("Error sending notification: ", err)
 		case response != nil && response.Status != 1:
-			log.Error("Pushover response indicates failure: ", response.Errors)
+			log.Print("Pushover response indicates failure: ", response.Errors)
 		default:
 			log.Println("Successfully sent notification")
 			break SENDLOOP
